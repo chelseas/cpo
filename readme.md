@@ -12,7 +12,7 @@ described in our paper [1].
 To configure, run the following command in the root folder of `rllab`:
 
 ```bash
-git submodule add -f https://github.com/jachiam/cpo sandbox/cpo
+git submodule add -f https://github.com/chelseas/cpo sandbox/cpo
 ```
 
 Run CPO in the Point-Gather environment with
