@@ -12,7 +12,7 @@ from rllab.optimizers.lbfgs_optimizer import LbfgsOptimizer
 from rllab.optimizers.first_order_optimizer import FirstOrderOptimizer
 from sandbox.cpo.safety_constraints.base import SafetyConstraint
 
-
+# failure prediction network. Used for cost shaping. See paper. 
 class ParameterizedBonusSafetyConstraint(LasagnePowered, SafetyConstraint, Serializable):
 
     def __init__(self, wrapped_constraint, 

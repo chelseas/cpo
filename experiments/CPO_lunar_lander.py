@@ -28,11 +28,13 @@ ec2_mode = False
 def run_task(*_):
         trpo_stepsize = 0.01
         trpo_subsample_factor = 0.2 
-        log_dir="/home/csidrane/Dropbox/y3_q1/cs332/project/src/data/"
-        env = GymEnv('LunarLanderContinuous-v2', record_video=True, log_dir=log_dir, force_reset=True)
+        log_dir="/Users/Chelsea/Dropbox/y3_q1/cs332/project/src/data/right"
+        env = GymEnv('LunarLanderContinuousRight-v2', record_video=True, log_dir=log_dir, force_reset=True)
+        # main policy
         policy = GaussianMLPPolicy(env.spec,
                     hidden_sizes=(64,32)
                  )
+        # baseline for removing variance
         baseline = GaussianMLPBaseline(
             env_spec=env.spec,
             regressor_args={
@@ -43,6 +45,7 @@ def run_task(*_):
                     'optimizer':ConjugateGradientOptimizer(subsample_factor=trpo_subsample_factor)
                     }
         )
+        # cost shaping for safety constraint? Or advantage estimator for the cost?
         safety_baseline = GaussianMLPBaseline(
             env_spec=env.spec,
             regressor_args={
@@ -56,8 +59,10 @@ def run_task(*_):
             )
         #
         # index 4 is angle, abs(angle) >= 0.4 rads is bad
-        # index 5 is angular velocity, guessing that abs(ang_vel)>=0.8 rads/sec is bad    
-        safety_constraint = LunarLanderSafetyConstraintAbs(max_value=0.4, idx=4, baseline=safety_baseline) 
+        # index 5 is angular velocity, guessing that abs(ang_vel)>=0.8 rads/sec is bad   
+        # limit is the max angle/angular velocity value
+        # max_value is the budget
+        safety_constraint = LunarLanderSafetyConstraintAbs(max_value=5.0, idx=4, limit=0.4, baseline=safety_baseline) 
         algo = CPO(
             env=env,
             policy=policy,

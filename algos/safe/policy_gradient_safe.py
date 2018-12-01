@@ -289,7 +289,7 @@ class PolicyGradientSafe(BatchPolopt, Serializable):
                 loss=surr_loss,
                 target=self.policy,
                 quad_leq_constraint=(mean_kl, self.step_size),
-                lin_leq_constraint=(f_safety, self.safety_step_size),
+                lin_leq_constraint=(f_safety, self.safety_step_size), #### THIS IS W"HERE YOU ENFORCE SAFETY BUDGET
                 inputs=input_list,
                 constraint_name_1="mean_kl",
                 constraint_name_2="safety",
