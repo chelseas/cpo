@@ -4,6 +4,8 @@ from sandbox.cpo.safety_constraints.base import *
 import numpy as np
 
 # ?-? constraint. 
+# TODO: don't use max value of the discounted return as a limiting value. 
+# use different values for total discounted return cost max
 class LunarLanderSafetyConstraintAbs(SafetyConstraint, Serializable):
 
     def __init__(self, max_value=1., idx=-3, **kwargs):
