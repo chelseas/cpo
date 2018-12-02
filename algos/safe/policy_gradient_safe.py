@@ -74,6 +74,7 @@ class PolicyGradientSafe(BatchPolopt, Serializable):
             clip_IS_coeff_below=False,
             IS_coeff_upper_bound=5,
             IS_coeff_lower_bound=0,
+            sampler_cls=BatchSamplerSafe,
             **kwargs):
 
 
@@ -158,7 +159,7 @@ class PolicyGradientSafe(BatchPolopt, Serializable):
         self.relative_weights = relative_weights
 
         super(PolicyGradientSafe, self).__init__(optimizer=optimizer, 
-                                                 sampler_cls=BatchSamplerSafe,
+                                                 sampler_cls=sampler_cls,
                                                  **kwargs)
 
         # safety tradeoff
@@ -236,6 +237,7 @@ class PolicyGradientSafe(BatchPolopt, Serializable):
 
         ent = dist.entropy_sym(dist_info_vars)
         kl = dist.kl_sym(old_dist_info_vars, dist_info_vars)
+        # the error is here!! In the next line!
         lr = dist.likelihood_ratio_sym(action_var, old_dist_info_vars, dist_info_vars)
         if is_recurrent:
             mean_ent = TT.sum(weights_var * ent * valid_var) / TT.sum(valid_var)
