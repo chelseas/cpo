@@ -1,5 +1,8 @@
 import backtrace
 
+import rllab.training_configs
+import _pickle as cPickle
+
 backtrace.hook(
     reverse=False,
     align=False,
@@ -51,7 +54,7 @@ class dummy(object):
 def run_task(*_):
         trpo_stepsize = 0.01
         trpo_subsample_factor = 0.2 
-        log_dir="/Users/Chelsea/Dropbox/y3_q1/cs332/project/src/data/meta"
+        log_dir=rllab.training_configs.LOG_DIR_PATH+"/meta/"
         env = GymEnv('LunarLanderContinuous-v2', record_video=True, log_dir=log_dir, force_reset=True)
         #
         # load subpolicies
@@ -59,7 +62,17 @@ def run_task(*_):
         # Change this code 
         ######################################################
         #subpolices = load_subpolicies()
-        subpolicies = {0: dummy(), 1:dummy()}
+
+        with open(rllab.training_configs.up_subpol_path, 'rb') as f:
+            sp_up = cPickle.load(f)
+        with open(rllab.training_configs.down_subpol_path, 'rb') as f:
+            sp_down = cPickle.load(f)
+        with open(rllab.training_configs.right_subpol_path, 'rb') as f:
+            sp_right = cPickle.load(f)
+        with open(rllab.training_configs.left_subpol_path, 'rb') as f:
+            sp_left = cPickle.load(f)
+
+        subpolicies = {0: sp_up, 1:sp_down, 2:sp_right, 3:sp_left}
         ######################################################
         # # #
         ######################################################
@@ -125,7 +138,7 @@ def run_task(*_):
 
 run_experiment_lite(
     run_task,
-    n_parallel=5,
+    n_parallel=1,
     snapshot_mode="last",
     exp_prefix='CPO-LunarLanderNonHierarchicalSafeAngle',
     seed=1,
