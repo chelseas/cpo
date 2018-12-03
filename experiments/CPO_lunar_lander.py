@@ -74,7 +74,7 @@ def run_task(*_):
             safety_gae_lambda=1,
             batch_size=5000,
             max_path_length=300, 
-            n_itr=100,
+            n_itr=250,
             gae_lambda=0.95,
             discount=0.995,
             step_size=trpo_stepsize,
@@ -86,7 +86,7 @@ def run_task(*_):
 
 run_experiment_lite(
     run_task,
-    n_parallel=1,
+    n_parallel=2,
     snapshot_mode="last",
     exp_prefix='CPO-LunarLanderNonHierarchicalSafeAngle',
     seed=1,
