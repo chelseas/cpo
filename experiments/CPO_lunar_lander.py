@@ -32,8 +32,6 @@ def run_task(*_):
         trpo_stepsize = 0.01
         trpo_subsample_factor = 0.2 
         log_dir=rllab.training_configs.LOG_DIR_PATH+"/"+subpol+"/"
-        print("LOGDIR"*20)
-        print(log_dir)
         env = GymEnv('LunarLanderContinuous'+subpol+'-v2', record_video=True, log_dir=log_dir, force_reset=True)
         # main policy
         policy = GaussianMLPPolicy(env.spec,
