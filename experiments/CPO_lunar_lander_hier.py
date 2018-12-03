@@ -29,7 +29,7 @@ from rllab.envs.gym_env import GymEnv
 from rllab.spaces.discrete import Discrete
 
 # Sampler
-from sandbox.cpo.algos.safe.meta_sampler_safe import MetaBatchSamplerSafe
+from sandbox.cpo.algos.safe.meta_sampler_safe_simple import MetaBatchSamplerSafeSimple
 
 # Policy optimization
 from sandbox.cpo.algos.safe.cpo import CPO
@@ -117,7 +117,7 @@ def run_task(*_):
             discount=0.995,
             step_size=trpo_stepsize,
             optimizer_args={'subsample_factor':trpo_subsample_factor},
-            sampler_cls=MetaBatchSamplerSafe,
+            sampler_cls=MetaBatchSamplerSafeSimple,
             #plot=True,
         )
         algo.train()
