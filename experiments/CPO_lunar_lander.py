@@ -28,7 +28,7 @@ ec2_mode = False
 def run_task(*_):
         trpo_stepsize = 0.01
         trpo_subsample_factor = 0.2 
-        log_dir="/Users/Chelsea/Dropbox/y3_q1/cs332/project/src/data/right"
+        log_dir="/Users/christopherlazarus/Desktop/cs332-2"
         env = GymEnv('LunarLanderContinuousRight-v2', record_video=True, log_dir=log_dir, force_reset=True)
         # main policy
         policy = GaussianMLPPolicy(env.spec,
@@ -83,7 +83,7 @@ def run_task(*_):
 
 run_experiment_lite(
     run_task,
-    n_parallel=5,
+    n_parallel=4,
     snapshot_mode="last",
     exp_prefix='CPO-LunarLanderNonHierarchicalSafeAngle',
     seed=1,
