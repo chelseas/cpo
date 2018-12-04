@@ -25,14 +25,14 @@ import lasagne.nonlinearities as NL
 from rllab.policies.meta_policy import MetaPolicy
 
 # Baseline
-from sandbox.cpo.baselines.gaussian_mlp_baseline import GaussianMLPBaseline
+from sandbox.cpo.baselines.categorical_mlp_baseline import CategoricalMLPBaseline
 
 # Environment
 from rllab.envs.gym_env import GymEnv
 from rllab.spaces.discrete import Discrete
 
 # Sampler
-from sandbox.cpo.algos.safe.meta_sampler_safe_simple import MetaBatchSamplerSafeSimple
+from sandbox.cpo.algos.safe.meta_sampler_safe import MetaBatchSamplerSafe
 
 # Policy optimization
 from sandbox.cpo.algos.safe.cpo import CPO
@@ -42,6 +42,7 @@ from sandbox.cpo.safety_constraints.lunar_lander import LunarLanderSafetyConstra
 
 # Utils
 from copy import deepcopy
+from scripts.custom_experiment import custom_run_experiment
 
 ec2_mode = False
 
@@ -61,8 +62,6 @@ def run_task(*_):
         ######################################################
         # Change this code 
         ######################################################
-        #subpolices = load_subpolicies()
-
         with open(rllab.training_configs.up_subpol_path, 'rb') as f:
             sp_up = cPickle.load(f)
         with open(rllab.training_configs.down_subpol_path, 'rb') as f:
@@ -71,7 +70,7 @@ def run_task(*_):
             sp_right = cPickle.load(f)
         with open(rllab.training_configs.left_subpol_path, 'rb') as f:
             sp_left = cPickle.load(f)
-
+        #
         subpolicies = {0: sp_up, 1:sp_down, 2:sp_right, 3:sp_left}
         ######################################################
         # # #
@@ -89,23 +88,23 @@ def run_task(*_):
                  )
         #
         # baseline for removing variance
-        baseline = GaussianMLPBaseline(
+        baseline = CategoricalMLPBaseline(
             env_spec=env_mod.spec,
             regressor_args={
                     'hidden_sizes': (64,32),
                     'hidden_nonlinearity': NL.tanh,
-                    'learn_std':False,
+                    #'learn_std':False,
                     'step_size':trpo_stepsize,
                     'optimizer':ConjugateGradientOptimizer(subsample_factor=trpo_subsample_factor)
                     }
         )
         # cost shaping for safety constraint? Or advantage estimator for the cost?
-        safety_baseline = GaussianMLPBaseline(
+        safety_baseline = CategoricalMLPBaseline(
             env_spec=env_mod.spec,
             regressor_args={
                     'hidden_sizes': (64,32),
                     'hidden_nonlinearity': NL.tanh,
-                    'learn_std':False,
+                    #'learn_std':False,
                     'step_size':trpo_stepsize,
                     'optimizer':ConjugateGradientOptimizer(subsample_factor=trpo_subsample_factor)
                     },
@@ -130,7 +129,7 @@ def run_task(*_):
             discount=0.995,
             step_size=trpo_stepsize,
             optimizer_args={'subsample_factor':trpo_subsample_factor},
-            sampler_cls=MetaBatchSamplerSafeSimple,
+            sampler_cls=MetaBatchSamplerSafe,
             #plot=True,
         )
         algo.train()
@@ -140,9 +139,16 @@ run_experiment_lite(
     run_task,
     n_parallel=1,
     snapshot_mode="last",
-    exp_prefix='CPO-LunarLanderNonHierarchicalSafeAngle',
+    exp_prefix='CPO-LunarLanderNonHierarchicalSafeAngleBugFix',
     seed=1,
     mode = "ec2" if ec2_mode else "local"
     #plot=True
 )
+
+# custom_run_experiment(run_task, 
+#     snapshot_mode="last", 
+#     exp_name="CPO-LunarLanderNonHierarchicalSafeAngleBugFix",
+#     plot=False, #log_dir=None, tabular_log_file="progress.csv", text_log_file="debug.log", params_log_file="params.json", log_tabular_only=False
+#     snapshot_gap=1
+#      )
 

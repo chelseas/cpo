@@ -16,12 +16,14 @@ class CPO(PolicyGradientSafe, Serializable):
             safety_tradeoff=False,
             learn_safety_tradeoff_coeff=False,
             **kwargs):
+        #import pdb; pdb.set_trace()
         Serializable.quick_init(self, locals())
         if optimizer is None:
             if optimizer_args is None:
                 optimizer_args = dict()
             optimizer = ConjugateConstraintOptimizer(**optimizer_args)
 
+        #import pdb; pdb.set_trace()
 
         if 'safety_constrained_optimizer' in kwargs.keys():
             kwargs.pop('safety_constrained_optimizer')

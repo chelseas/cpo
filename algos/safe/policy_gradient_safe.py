@@ -1,11 +1,11 @@
 import gc
 import numpy as np
 import time
-from rllab.algos.batch_polopt_simple import BatchPoloptSimple
+from rllab.algos.batch_polopt import BatchPolopt
 from rllab.baselines.zero_baseline import ZeroBaseline
 from rllab.optimizers.conjugate_gradient_optimizer import ConjugateGradientOptimizer
 from rllab.core.serializable import Serializable
-from rllab.sampler import parallel_sampler
+#from rllab.sampler import parallel_sampler
 from rllab.misc.overrides import overrides
 from rllab.misc import ext
 from rllab.misc import special
@@ -18,7 +18,7 @@ import theano.tensor as TT
 
 from sandbox.cpo.algos.safe.sampler_safe import BatchSamplerSafe
 
-class PolicyGradientSafe(BatchPoloptSimple, Serializable):
+class PolicyGradientSafe(BatchPolopt, Serializable):
     """
     Policy Gradient base algorithm
 
@@ -158,6 +158,7 @@ class PolicyGradientSafe(BatchPoloptSimple, Serializable):
         self.batch_aggregate_coeff = batch_aggregate_coeff
         self.relative_weights = relative_weights
 
+        #import pdb; pdb.set_trace()
         super(PolicyGradientSafe, self).__init__(optimizer=optimizer, 
                                                  sampler_cls=sampler_cls,
                                                  **kwargs)

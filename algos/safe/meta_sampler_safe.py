@@ -54,6 +54,7 @@ class MetaBatchSamplerSafe(Sampler):
         meta_parallel_sampler.terminate_task(scope=self.algo.scope)
 
     def obtain_samples(self, itr):
+        print("Using meta_parallel_sampler_safe")
         cur_params = self.algo.policy.get_param_values()
         paths = meta_parallel_sampler.sample_paths(
             policy_params=cur_params,
