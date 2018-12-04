@@ -86,7 +86,7 @@ def run_task(*_):
 
 run_experiment_lite(
     run_task,
-    n_parallel=2,
+    n_parallel=4,
     snapshot_mode="last",
     exp_prefix='CPO-LunarLanderNonHierarchicalSafeAngle',
     seed=1,
