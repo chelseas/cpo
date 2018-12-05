@@ -26,7 +26,6 @@ from rllab.policies.meta_policy import MetaPolicy
 
 # Baseline
 from sandbox.cpo.baselines.categorical_mlp_baseline import CategoricalMLPBaseline
-from sandbox.cpo.baselines.gaussian_mlp_baseline import GaussianMLPBaseline
 
 # Environment
 from rllab.envs.gym_env import GymEnv
@@ -43,21 +42,16 @@ from sandbox.cpo.safety_constraints.lunar_lander import LunarLanderSafetyConstra
 
 # Utils
 from copy import deepcopy
-from scripts.custom_experiment import custom_run_experiment
 
 ec2_mode = False
 
-class dummy(object):
-    def __init__(self):
-        pass
-    def get_action(self, o):
-        return [0.0,0.0], "info"
+from rllab.policies.meta_policy import LLA
 
 def run_task(*_):
         trpo_stepsize = 0.01
         trpo_subsample_factor = 0.2 
-        log_dir=rllab.training_configs.LOG_DIR_PATH+"/meta/"
-        env = GymEnv('LunarLanderContinuous-v2', record_video=False, log_dir=log_dir, force_reset=True)
+        log_dir=rllab.training_configs.LOG_DIR_PATH+"/metaLLA_MIXED/"
+        env = GymEnv('LunarLanderContinuous-v2', record_video=True, log_dir=log_dir, force_reset=True)
         #
         # load subpolicies
         ######################################################
@@ -71,8 +65,13 @@ def run_task(*_):
             sp_right = cPickle.load(f)
         with open(rllab.training_configs.left_subpol_path, 'rb') as f:
             sp_left = cPickle.load(f)
-        #
-        subpolicies = {0: sp_up, 1:sp_down, 2:sp_right, 3:sp_left}
+
+        LLA1 = LLA('main engine')
+        LLA2 = LLA('left thruster')
+        LLA3 = LLA('right thruster')
+        LLA4 = LLA('noop')
+
+        subpolicies = {0: sp_up, 1:sp_down, 2:sp_right, 3:sp_left, 4:LLA1, 5:LLA2, 6:LLA3, 7:LLA4 }
         ######################################################
         # # #
         ######################################################
@@ -85,7 +84,8 @@ def run_task(*_):
         # construct meta-policy
         policy = MetaPolicy(env_mod.spec,
                     subpolicies,
-                    hidden_sizes=(64,32)
+                    hidden_sizes=(64,32),
+                    mixed=True
                  )
         #
         # baseline for removing variance
@@ -110,8 +110,7 @@ def run_task(*_):
                     'optimizer':ConjugateGradientOptimizer(subsample_factor=trpo_subsample_factor)
                     },
             target_key='safety_returns',
-            )
-        #
+            )        #
         # index 4 is angle, abs(angle) >= 0.4 rads is bad
         # index 5 is angular velocity, guessing that abs(ang_vel)>=0.8 rads/sec is bad   
         # limit is the max angle/angular velocity value
@@ -123,8 +122,8 @@ def run_task(*_):
             baseline=baseline,
             safety_constraint=safety_constraint,
             safety_gae_lambda=1,
-            batch_size=2500,
-            max_path_length=30, 
+            batch_size=5000,
+            max_path_length=100, 
             n_itr=100,
             gae_lambda=0.95,
             discount=0.995,
@@ -140,16 +139,9 @@ run_experiment_lite(
     run_task,
     n_parallel=1,
     snapshot_mode="last",
-    exp_prefix='CPO-LunarLanderNonHierarchicalSafeAngleBugFix',
+    exp_prefix='CPO-LunarLanderSafeAngleMIXED',
     seed=1,
     mode = "ec2" if ec2_mode else "local"
     #plot=True
 )
-
-# custom_run_experiment(run_task, 
-#     snapshot_mode="last", 
-#     exp_name="CPO-LunarLanderNonHierarchicalSafeAngleBugFix",
-#     plot=False, #log_dir=None, tabular_log_file="progress.csv", text_log_file="debug.log", params_log_file="params.json", log_tabular_only=False
-#     snapshot_gap=1
-#      )
 
