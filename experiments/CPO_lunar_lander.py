@@ -72,9 +72,9 @@ def run_task(*_):
             baseline=baseline,
             safety_constraint=safety_constraint,
             safety_gae_lambda=1,
-            batch_size=5000,
-            max_path_length=300, 
-            n_itr=250,
+            batch_size=500, # 5000
+            max_path_length=200, # 300
+            n_itr=60,#100
             gae_lambda=0.95,
             discount=0.995,
             step_size=trpo_stepsize,

@@ -62,6 +62,7 @@ class MetaBatchSamplerSafe(Sampler):
             max_path_length=self.algo.max_path_length,
             scope=self.algo.scope,
         )
+        #import pdb; pdb.set_trace()
 
         """log_likelihoods for importance sampling"""
         for path in paths:
@@ -74,7 +75,7 @@ class MetaBatchSamplerSafe(Sampler):
             paths = local_truncate_paths(paths, self.algo.batch_size)
 
         """keep track of path length"""
-        self.env_interacts = sum([len(path["rewards"]) for path in paths])
+        self.env_interacts = sum([path["environment_interacts"] for path in paths])
         self.total_env_interacts += self.env_interacts
         self.mean_path_len = float(self.env_interacts)/len(paths)
 
@@ -310,7 +311,6 @@ class MetaBatchSamplerSafe(Sampler):
         meanwhile, the log likelihood of taking the actions on the original behavior policy
         can still be found in path["log_likelihood"].
         """
-        import pdb; pdb.set_trace()
         state_info_list = [path["agent_infos"][k] for k in self.algo.policy.state_info_keys]
         input_list = tuple([path["observations"]] + state_info_list)
         cur_dist_info = self.algo.dist_info_vars_func(*input_list)
@@ -506,7 +506,7 @@ class MetaBatchSamplerSafe(Sampler):
         logger.record_tabular('ExplainedVariance', evs[0])
         logger.record_tabular('NumBatches',len(self.experience_replay))
         logger.record_tabular('NumTrajs', len(paths))
-        logger.record_tabular('MeanPathLen',self.mean_path_len)
+        logger.record_tabular('MeanPathLenLowLevelSteps',self.mean_path_len)
         #logger.record_tabular('MeanWeight',np.mean(samples_data['weights']))
         logger.record_tabular('EnvInteracts',self.env_interacts)
         logger.record_tabular('TotalEnvInteracts',self.total_env_interacts)
